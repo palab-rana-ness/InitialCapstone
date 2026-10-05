@@ -1,0 +1,10 @@
+INFO:     127.0.0.1:58589 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58639 - "POST /api/v1/incidents/ai-diagnosis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58665 - "POST /api/v1/incidents/ai-diagnosis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58666 - "POST /api/v1/incidents/ai-diagnosis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58943 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61456 - "POST /api/v1/incidents/ai-diagnosis HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:62567 - "POST /api/v1/incidents/ai-diagnosis HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:62627 - "POST /api/v1/incidents/ai-diagnosis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62832 - "POST /api/v1/incidents/ai-diagnosis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63231 - "POST /api/v1/incidents/ai-diagnosis HTTP/1.1" 200 OK

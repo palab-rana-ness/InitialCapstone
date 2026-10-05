@@ -1,0 +1,40 @@
+INFO:     Started server process [9096]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:app.graph.nodes:Validated trigger 20260930_064500_bbbbbb for tenant tenant_001
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident 20260930_064500_bbbbbb
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 0 log lines from New Relic for incident 20260930_064500_bbbbbb
+INFO:app.graph.nodes:Validated trigger 20260930_064500_bbbbbb for tenant tenant_001
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident 20260930_064500_bbbbbb
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 0 log lines from New Relic for incident 20260930_064500_bbbbbb
+INFO:app.graph.nodes:Validated trigger 20260930_064500_bbbbbb for tenant tenant_001
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident 20260930_064500_bbbbbb
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 4 log lines from New Relic for incident 20260930_064500_bbbbbb
+INFO:app.graph.nodes:Validated incident 20260930_064500_bbbbbb for tenant tenant_001
+INFO:app.graph.nodes:Retrieved 0 similar incidents for tenant tenant_001
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Stored incident memory for 20260930_064500_bbbbbb
+INFO:app.graph.nodes:Validated trigger 20260930_070000_cccccc for tenant tenant_001
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident 20260930_070000_cccccc
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 4 log lines from New Relic for incident 20260930_070000_cccccc
+INFO:app.graph.nodes:Validated incident 20260930_070000_cccccc for tenant tenant_001
+INFO:app.graph.nodes:Retrieved 1 similar incidents for tenant tenant_001
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Stored incident memory for 20260930_070000_cccccc
+INFO:app.graph.nodes:Validated trigger 20260930_071500_dddddd for tenant tenant_002
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident 20260930_071500_dddddd
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 4 log lines from New Relic for incident 20260930_071500_dddddd
+INFO:app.graph.nodes:Validated incident 20260930_071500_dddddd for tenant tenant_002
+INFO:app.graph.nodes:Retrieved 0 similar incidents for tenant tenant_002
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Stored incident memory for 20260930_071500_dddddd
+INFO:app.graph.nodes:Validated trigger x1 for tenant tenant_001
