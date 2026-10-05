@@ -5,3 +5,4 @@ faker
 psycopg2-binary
 fastapi
 uvicorn
+httpx

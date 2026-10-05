@@ -7,8 +7,8 @@ from autonomous_pipeline_incident_ui.service import (
     get_pipeline_run_result,
     diagnose_pipeline_run,
     polling_settings,
-    record_pipeline_run_incident,
     resolve_pipeline_incident,
+    decide_pipeline_remediation,
     get_pipeline_history,
 )
 from autonomous_pipeline_incident_ui.models import PipelineHistoryEntry
@@ -33,6 +33,7 @@ class PipelineRunState(rx.State):
     history_loading: bool = False
     expanded_history_id: str = ""
     resolve_loading: bool = False
+    decision_loading: bool = False
     _generation: int = 0
     _scope: tuple[str, str] = ("", "")
 
@@ -188,15 +189,12 @@ class PipelineRunState(rx.State):
                     if result.outcome == "PASSED"
                     else "Pipeline Failed"
                 )
-            await record_pipeline_run_incident(
-                tenant,
-                platform,
-                started.run_id,
-                pipeline_type,
-                result.outcome,
-                result.details,
-            )
-            await self._reload_history(tenant)
+            # capstone-ui's backend (Agent 1) already records this incident
+            # itself server-side - no client-side write needed anymore.
+            history = await self._reload_history(tenant)
+            async with self:
+                if await self._matches(generation, tenant, platform) and history is not None:
+                    self.history = history
         except Exception as error:
             kind = error.kind if isinstance(error, ServiceError) else "api"
             try:
@@ -240,7 +238,10 @@ class PipelineRunState(rx.State):
                 self.diagnosis = result.diagnosis
                 self.diagnosis_details = result.details
                 self.status_text = "Diagnosis received."
-            await self._reload_history(tenant)
+            history = await self._reload_history(tenant)
+            async with self:
+                if await self._matches(generation, tenant, platform) and history is not None:
+                    self.history = history
         except Exception as error:
             kind = error.kind if isinstance(error, ServiceError) else "api"
             try:
@@ -261,11 +262,12 @@ class PipelineRunState(rx.State):
         if self.show_fix:
             self.fix_note = "Fix API integration is not implemented yet."
 
-    async def _reload_history(self, tenant: str) -> None:
+    async def _reload_history(self, tenant: str) -> list[PipelineHistoryEntry] | None:
         try:
-            self.history = await get_pipeline_history(tenant)
+            return await get_pipeline_history(tenant)
         except Exception:
             logging.exception("Failed to load pipeline run history")
+            return None
 
     @rx.event(background=True)
     async def load_history(self):
@@ -301,9 +303,52 @@ class PipelineRunState(rx.State):
             self.resolve_loading = True
         try:
             await resolve_pipeline_incident(incident_id)
-            await self._reload_history(tenant)
+            history = await self._reload_history(tenant)
+            if history is not None:
+                async with self:
+                    self.history = history
         except ServiceError:
             logging.exception("Failed to mark incident resolved")
         finally:
             async with self:
                 self.resolve_loading = False
+
+    @rx.event(background=True)
+    async def approve_history_remediation(self, incident_id: str):
+        async with self:
+            if self.decision_loading:
+                return
+            scope = await self.get_state(ScopeState)
+            tenant = scope.tenant_id
+            self.decision_loading = True
+        try:
+            await decide_pipeline_remediation(incident_id, True)
+            history = await self._reload_history(tenant)
+            if history is not None:
+                async with self:
+                    self.history = history
+        except ServiceError:
+            logging.exception("Failed to approve remediation")
+        finally:
+            async with self:
+                self.decision_loading = False
+
+    @rx.event(background=True)
+    async def reject_history_remediation(self, incident_id: str):
+        async with self:
+            if self.decision_loading:
+                return
+            scope = await self.get_state(ScopeState)
+            tenant = scope.tenant_id
+            self.decision_loading = True
+        try:
+            await decide_pipeline_remediation(incident_id, False)
+            history = await self._reload_history(tenant)
+            if history is not None:
+                async with self:
+                    self.history = history
+        except ServiceError:
+            logging.exception("Failed to reject remediation")
+        finally:
+            async with self:
+                self.decision_loading = False

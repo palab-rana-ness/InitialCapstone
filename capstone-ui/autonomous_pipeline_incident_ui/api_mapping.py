@@ -749,6 +749,111 @@ def normalize_pipeline_history(data: object, tenant: str) -> list[PipelineHistor
     return entries
 
 
+def normalize_backend_pipeline_start(
+    data: object,
+    tenant: str,
+    platform: str,
+    pipeline_type: str,
+) -> PipelineRunStartResponse:
+    """Maps capstone-ui's own POST /pipeline-run/start response (Agent 1)."""
+    body = unwrap(data, ("data",), tenant, platform)
+    if not isinstance(body, dict):
+        raise ServiceError("api")
+    workflow_run_id = _first_text(body.get("workflow_run_id"))
+    if not workflow_run_id:
+        raise ServiceError("api")
+    return PipelineRunStartResponse(
+        run_id=workflow_run_id,
+        status=_first_text(body.get("status")),
+        accepted=True,
+        tenant_id=tenant,
+        platform_id=platform,
+        pipeline_type=pipeline_type,
+    )
+
+
+# Workflow states that mean the Pipeline Agent is still working (not a terminal
+# PASSED/FAILED outcome) - the caller should keep polling.
+_PENDING_WORKFLOW_STATES = {
+    "STARTING",
+    "RUNNING",
+    "FAILED",  # terminal for the pipeline itself, but diagnosis is still in flight
+    "DIAGNOSING",
+}
+
+
+def normalize_backend_pipeline_status(
+    data: object,
+    tenant: str,
+    platform: str,
+    workflow_run_id: str,
+) -> PipelineRunResultResponse:
+    """Maps capstone-ui's own GET /pipeline-run/{id}/status response.
+
+    Raises ServiceError("empty") while the workflow is still in flight so the
+    existing polling loop in PipelineRunState keeps retrying, exactly like the
+    old DataPipeline-direct 404-while-pending behavior.
+    """
+    body = unwrap(data, ("data",), tenant, platform)
+    if not isinstance(body, dict):
+        raise ServiceError("api")
+    check_scope(body, tenant, platform)
+    state = _first_text(body.get("state"))
+    # A FAILED pipeline is only "ready" for the UI once Agent 2/3 have attached
+    # a diagnosis/remediation plan (state moves past AWAITING_APPROVAL or ERROR).
+    if state in _PENDING_WORKFLOW_STATES:
+        raise ServiceError("empty")
+    outcome = "PASSED" if state == "PASSED" else "FAILED" if state else ""
+    if not outcome:
+        raise ServiceError("api")
+    return PipelineRunResultResponse(
+        run_id=workflow_run_id,
+        outcome=outcome,
+        status=state,
+        details=_first_text(body.get("error_detail")),
+        tenant_id=tenant,
+        platform_id=platform,
+        incident_id=_first_text(body.get("incident_id")),
+    )
+
+
+def normalize_backend_diagnosis(
+    data: object,
+    tenant: str,
+    platform: str,
+    run_id: str,
+) -> PipelineDiagnosisResponse:
+    """Maps capstone-ui's own GET /incidents/{id}/diagnosis response - the
+    diagnosis Agent 2 already computed and persisted. Never calls AiDiagnosis
+    directly from the UI."""
+    body = unwrap(data, ("data", "diagnosis"), tenant, platform)
+    if not isinstance(body, dict):
+        raise ServiceError("api")
+    if not body.get("available"):
+        raise ServiceError("empty")
+    failure_location = _first_text(body.get("failure_location"))
+    root_cause = _first_text(body.get("summary"))
+    if not root_cause:
+        raise ServiceError("empty")
+    detail_lines = []
+    evidence = body.get("evidence", [])
+    if isinstance(evidence, list) and evidence:
+        detail_lines.append(
+            "Evidence: " + "; ".join(display_value(item) for item in evidence)
+        )
+    label = (
+        f"Failed at {failure_location}: {root_cause}" if failure_location else root_cause
+    )
+    return PipelineDiagnosisResponse(
+        run_id=run_id,
+        diagnosis=label,
+        details="\n".join(detail_lines),
+        tenant_id=tenant,
+        platform_id=platform,
+        pipeline_type="",
+    )
+
+
 def normalize_retail_tenants(data: object) -> list[ScopeOption]:
     body = unwrap(data, ("data",))
     if not isinstance(body, list):

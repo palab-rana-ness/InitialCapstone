@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import text
 import os
 
+from app.agents import pipeline_agent
 from app.database.connection import SessionLocal, engine
 from app.routers import incidents, tenants, platforms
 from app.seed import init_db, seed_if_empty
@@ -14,7 +15,7 @@ app.include_router(platforms.router)
 
 
 @app.on_event("startup")
-def on_startup():
+async def on_startup():
     init_db(engine)
     # Real pipeline-run incidents are the source of truth now; only seed the
     # old fixture rows when explicitly asked for (e.g. local UI demos).
@@ -24,6 +25,9 @@ def on_startup():
             seed_if_empty(db)
         finally:
             db.close()
+    # Resume any Pipeline Agent workflow runs that were still in-flight when
+    # this process last stopped (restart recovery for the 20-30min pipeline).
+    pipeline_agent.reconcile_on_startup()
 
 
 @app.get("/", include_in_schema=False)

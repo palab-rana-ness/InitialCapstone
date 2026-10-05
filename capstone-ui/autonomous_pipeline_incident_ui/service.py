@@ -11,11 +11,10 @@ from autonomous_pipeline_incident_ui.http_client import (
     catalog_json,
     retail_tenants_json,
     config_json,
-    pipeline_json,
-    ai_diagnosis_json,
-    pipeline_run_ingest_json,
-    diagnosis_result_json,
+    pipeline_run_start_backend_json,
+    pipeline_run_status_backend_json,
     resolve_incident_json,
+    remediation_decision_json,
     pipeline_history_json,
 )
 from autonomous_pipeline_incident_ui.api_mapping import (
@@ -30,10 +29,10 @@ from autonomous_pipeline_incident_ui.api_mapping import (
     normalize_retail_tenants,
     normalize_config,
     normalize_platform_config,
-    normalize_pipeline_run_start,
-    normalize_pipeline_run_result,
-    normalize_pipeline_diagnosis,
     normalize_pipeline_history,
+    normalize_backend_pipeline_start,
+    normalize_backend_pipeline_status,
+    normalize_backend_diagnosis,
 )
 from autonomous_pipeline_incident_ui.models import (
     Catalog,
@@ -607,13 +606,16 @@ async def start_pipeline_run(
     platform: str,
     pipeline_type: str,
 ) -> PipelineRunStartResponse:
+    """Calls capstone-ui's own backend (Agent 1), which starts DataPipeline's run
+    and owns all polling/failure-handoff server-side. Never calls DataPipeline
+    directly from the UI."""
     try:
         request = PipelineRunRequest(
             tenant_id=tenant,
             platform_id=platform,
             pipeline_type=pipeline_type,
         )
-        if _pipeline_development_provider():
+        if _development_provider():
             from autonomous_pipeline_incident_ui.mock_provider import (
                 pipeline_run_start,
             )
@@ -624,15 +626,11 @@ async def start_pipeline_run(
                 request.pipeline_type,
             )
         else:
-            data = await pipeline_json(
-                "start",
-                tenant,
-                platform,
-                method="POST",
-                body={"pipeline_type": request.pipeline_type},
+            data = await pipeline_run_start_backend_json(
+                tenant, platform, request.pipeline_type
             )
             result = mapped(
-                normalize_pipeline_run_start,
+                normalize_backend_pipeline_start,
                 data,
                 tenant,
                 platform,
@@ -656,25 +654,22 @@ async def get_pipeline_run_result(
     platform: str,
     run_id: str,
 ) -> PipelineRunResultResponse:
+    """Polls capstone-ui's own backend (local DB read) for the workflow's current
+    state. Raises ServiceError('empty') while Agent 1/2/3 are still working, so
+    the caller's existing polling loop keeps retrying until a terminal outcome."""
     try:
         if not run_id.strip():
             raise ServiceError("request_invalid")
-        if _pipeline_development_provider():
+        if _development_provider():
             from autonomous_pipeline_incident_ui.mock_provider import (
                 pipeline_run_result,
             )
 
             result = await pipeline_run_result(tenant, platform, run_id)
         else:
-            data = await pipeline_json(
-                "result",
-                tenant,
-                platform,
-                run_id=run_id,
-                method="GET",
-            )
+            data = await pipeline_run_status_backend_json(run_id)
             result = mapped(
-                normalize_pipeline_run_result,
+                normalize_backend_pipeline_status,
                 data,
                 tenant,
                 platform,
@@ -695,61 +690,28 @@ async def get_pipeline_run_result(
         raise ServiceError(kind) from None
 
 
-async def record_pipeline_run_incident(
-    tenant: str,
-    platform: str,
-    run_id: str,
-    pipeline_type: str,
-    outcome: str,
-    details: str,
-) -> None:
-    """Best-effort: store every completed pipeline run in Postgres as a
-    history entry. Never raises -- a logging failure here must not affect
-    what the pipeline panel shows the user.
-    """
-    try:
-        await pipeline_run_ingest_json(
-            {
-                "tenant_id": tenant,
-                "platform_id": platform,
-                "incident_id": run_id,
-                "pipeline": pipeline_type,
-                "outcome": outcome,
-                "details": details,
-            }
-        )
-    except Exception:
-        logging.exception("Failed to record pipeline run incident in Postgres")
-
-
-async def record_diagnosis_result(
-    run_id: str,
-    failure_location: str,
-    root_cause: str,
-    recent_logs: list[str],
-    remedies: list[dict],
-    message_for_ui: str,
-) -> None:
-    """Best-effort: persist the AI Diagnosis result for later viewing in history."""
-    try:
-        await diagnosis_result_json(
-            run_id,
-            {
-                "failure_location": failure_location,
-                "root_cause": root_cause,
-                "recent_logs": recent_logs[-20:],
-                "remedies": remedies,
-                "message_for_ui": message_for_ui,
-            },
-        )
-    except Exception:
-        logging.exception("Failed to record diagnosis result in Postgres")
-
-
 async def resolve_pipeline_incident(run_id: str) -> None:
     """A human marks this incident resolved. Does not execute any remediation."""
     try:
         await resolve_incident_json(run_id)
+    except Exception as error:
+        logging.exception("Unexpected error")
+        kind = error.kind if isinstance(error, ServiceError) else "api"
+        raise ServiceError(kind) from None
+
+
+async def decide_pipeline_remediation(incident_id: str, approve: bool) -> str:
+    """The single human approval gate for a proposed remediation plan. Executes
+    nothing - returns the resulting approval_status (APPROVED/REJECTED)."""
+    try:
+        decided_by = os.getenv("SENTINEL_CURRENT_USER", "").strip() or "operator"
+        data = await remediation_decision_json(
+            incident_id, "approve" if approve else "reject", decided_by
+        )
+        body = data.get("data", data) if isinstance(data, dict) else {}
+        if not isinstance(body, dict) or body.get("incident_id") != incident_id:
+            raise ServiceError("api")
+        return str(body.get("approval_status", ""))
     except Exception as error:
         logging.exception("Unexpected error")
         kind = error.kind if isinstance(error, ServiceError) else "api"
@@ -772,6 +734,9 @@ async def diagnose_pipeline_run(
     run_id: str,
     pipeline_type: str,
 ) -> PipelineDiagnosisResponse:
+    """Fetches the diagnosis Agent 2 already computed and persisted after the
+    pipeline failed. Never calls AiDiagnosis directly from the UI - diagnosis
+    is triggered automatically, server-side, by capstone-ui's Pipeline Agent."""
     try:
         request = PipelineDiagnosisRequest(
             run_id=run_id,
@@ -779,7 +744,7 @@ async def diagnose_pipeline_run(
             platform_id=platform,
             pipeline_type=pipeline_type,
         )
-        if _diagnosis_development_provider():
+        if _development_provider():
             from autonomous_pipeline_incident_ui.mock_provider import (
                 pipeline_run_diagnosis,
             )
@@ -791,32 +756,22 @@ async def diagnose_pipeline_run(
                 request.pipeline_type,
             )
         else:
-            # AI Diagnosis owns log retrieval (from New Relic); the UI only
-            # sends the identifiers it actually requires (its IncidentTrigger).
-            trigger = {
-                "tenant_id": request.tenant_id,
-                "incident_id": request.run_id,
-                "adapter": "spark",
-                "pipeline": request.pipeline_type,
-                "status": "FAILED",
-            }
-            data = await ai_diagnosis_json(trigger)
+            status_data = await pipeline_run_status_backend_json(run_id)
+            incident_id = ""
+            if isinstance(status_data, dict) and isinstance(status_data.get("data"), dict):
+                incident_id = str(status_data["data"].get("incident_id") or "")
+            if not incident_id:
+                raise ServiceError("empty")
+            data = await incident_json(
+                tenant, platform, identifier=incident_id, suffix="/diagnosis"
+            )
             result = mapped(
-                normalize_pipeline_diagnosis,
+                normalize_backend_diagnosis,
                 data,
                 tenant,
                 platform,
                 run_id,
             )
-            if isinstance(data, dict):
-                await record_diagnosis_result(
-                    run_id,
-                    str(data.get("failure_location", "")),
-                    str(data.get("root_cause", "")),
-                    [str(x) for x in data.get("recent_logs", [])],
-                    [r for r in data.get("remedies", []) if isinstance(r, dict)],
-                    str(data.get("message_for_ui", "")),
-                )
         if result.run_id != run_id:
             raise ServiceError("api")
         _validate_pipeline_scope(

@@ -59,6 +59,41 @@ class DiagnosisResultRequest(BaseModel):
     message_for_ui: str = ""
 
 
+class PipelineRunStartRequest(BaseModel):
+    """Body for POST /pipeline-run/start - triggers Agent 1 (Pipeline Agent)."""
+
+    tenant_id: str
+    platform_id: str
+    pipeline: str
+    pipeline_type: str = ""
+
+
+class WorkflowRunStatusResponse(BaseModel):
+    """Lightweight, local-DB-only status the Reflex UI polls (no external calls)."""
+
+    workflow_run_id: str
+    tenant_id: str
+    platform_id: str
+    pipeline: str
+    run_id: str | None = None
+    incident_id: str | None = None
+    state: str
+    current_agent: str
+    attempt_count: int
+    started_at: datetime
+    updated_at: datetime
+    completed_at: datetime | None = None
+    error_detail: str | None = None
+
+
+class RemediationDecisionRequest(BaseModel):
+    """Body for POST /{incident_id}/remediation/approve|reject - the single human
+    approval gate before a remediation plan is considered ready for future execution."""
+
+    decided_by: str
+    comment: str = ""
+
+
 def response_ok(message: str, data: dict[str, Any], request_id: str = "") -> StandardApiResponse:
     return StandardApiResponse(
         message=message,
