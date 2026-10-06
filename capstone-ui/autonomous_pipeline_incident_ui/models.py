@@ -235,6 +235,7 @@ class PipelineRunResultResponse(BaseModel):
     tenant_id: str = ""
     platform_id: str = ""
     pipeline_type: str = ""
+    incident_id: str = ""
 
 
 class PipelineDiagnosisRequest(BaseModel):

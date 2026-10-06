@@ -298,3 +298,28 @@ def mark_incident_resolved(db: Session, incident_id: str) -> IncidentDB | None:
     db.commit()
     db.refresh(row)
     return row
+
+
+def mark_awaiting_approval(db: Session, incident_id: str) -> IncidentDB | None:
+    """Remediation plan is ready; a human must approve/reject before anything executes."""
+    row = db.get(IncidentDB, incident_id)
+    if row is None:
+        return None
+
+    row.status = "AWAITING_APPROVAL"
+    row.updated_at = _now_utc()
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def mark_incident_rejected(db: Session, incident_id: str) -> IncidentDB | None:
+    row = db.get(IncidentDB, incident_id)
+    if row is None:
+        return None
+
+    row.status = "REJECTED"
+    row.updated_at = _now_utc()
+    db.commit()
+    db.refresh(row)
+    return row

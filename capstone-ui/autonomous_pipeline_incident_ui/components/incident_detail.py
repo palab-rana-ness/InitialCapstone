@@ -24,7 +24,7 @@ def entry_row(entry: DetailEntry) -> rx.Component:
         ),
         rx.el.p(
             entry.value,
-            class_name="mt-2 whitespace-pre-wrap break-words text-xs leading-6 text-zinc-200",
+            class_name="mt-2 whitespace-pre-wrap break-words text-xs leading-6 text-zinc-800",
         ),
         class_name="border-l border-amber-400/30 pl-4 py-2",
     )
@@ -54,9 +54,9 @@ def feedback(section: str) -> rx.Component:
             ),
             on_click=DetailState.refresh_section(section),
             disabled=DetailState.busy | (DetailState.confirmation != ""),
-            class_name="flex shrink-0 items-center gap-2 rounded-sm border border-white/10 bg-[#202226] px-3 py-2 text-[10px] text-zinc-300 hover:border-amber-400/40 hover:text-amber-300 disabled:cursor-wait disabled:opacity-40",
+            class_name="flex shrink-0 items-center gap-2 rounded-sm border border-black/10 bg-zinc-100 px-3 py-2 text-[10px] text-zinc-700 hover:border-amber-400/40 hover:text-amber-300 disabled:cursor-wait disabled:opacity-40",
         ),
-        class_name="flex flex-wrap items-center justify-between gap-3 border-t border-white/5 px-5 py-3",
+        class_name="flex flex-wrap items-center justify-between gap-3 border-t border-black/5 px-5 py-3",
     )
 
 
@@ -70,7 +70,7 @@ def section_panel(number: str, title: str, section: str) -> rx.Component:
                 DetailState.sections[section]["summary"] != "",
                 rx.el.p(
                     DetailState.sections[section]["summary"],
-                    class_name="text-sm leading-6 text-zinc-200",
+                    class_name="text-sm leading-6 text-zinc-800",
                 ),
             ),
             rx.cond(
@@ -104,7 +104,7 @@ def section_panel(number: str, title: str, section: str) -> rx.Component:
                         "Final outcome reported by the service",
                         class_name="text-[10px] text-zinc-500",
                     ),
-                    class_name="flex flex-wrap items-center gap-3 rounded-sm border border-white/10 bg-[#121416] p-4",
+                    class_name="flex flex-wrap items-center gap-3 rounded-sm border border-black/10 bg-white p-4",
                 ),
             ),
             rx.cond(
@@ -133,7 +133,7 @@ def section_panel(number: str, title: str, section: str) -> rx.Component:
                     rx.el.pre(
                         DetailState.sections[section]["logs"].join("\n"),
                         tab_index=0,
-                        class_name="max-h-60 overflow-auto rounded-sm border border-white/10 bg-[#101214] p-4 font-mono text-[10px] leading-6 text-zinc-300",
+                        class_name="max-h-60 overflow-auto rounded-sm border border-black/10 bg-zinc-100 p-4 font-mono text-[10px] leading-6 text-zinc-700",
                     ),
                 ),
                 rx.cond(
@@ -147,7 +147,7 @@ def section_panel(number: str, title: str, section: str) -> rx.Component:
             class_name="flex flex-col gap-5 p-5",
         ),
         feedback(section),
-        class_name="min-w-0 rounded-md border border-white/10 bg-[#191b1e]",
+        class_name="min-w-0 rounded-md border border-black/10 bg-white",
     )
 
 
@@ -157,7 +157,7 @@ def fact(label: str, value: str) -> rx.Component:
             label,
             class_name="mb-2 text-[9px] uppercase tracking-wider text-zinc-500",
         ),
-        rx.el.p(value, class_name="break-words text-xs text-zinc-200"),
+        rx.el.p(value, class_name="break-words text-xs text-zinc-800"),
         class_name="min-w-0",
     )
 
@@ -208,7 +208,7 @@ def action_controls() -> rx.Component:
                 rx.el.div(
                     rx.el.p(
                         DetailState.execution_policy,
-                        class_name="text-xs leading-6 text-zinc-200",
+                        class_name="text-xs leading-6 text-zinc-800",
                     ),
                     rx.el.p(
                         "Actions and permissions are returned by the service. Execution is never assumed successful.",
@@ -220,7 +220,7 @@ def action_controls() -> rx.Component:
             rx.el.label(
                 "Analysis reason (optional)",
                 html_for="analysis-reason",
-                class_name="mt-5 block text-[10px] text-zinc-400",
+                class_name="mt-5 block text-[10px] text-zinc-600",
             ),
             rx.el.input(
                 id="analysis-reason",
@@ -229,7 +229,7 @@ def action_controls() -> rx.Component:
                 on_change=DetailState.set_analysis_reason.debounce(300),
                 disabled=DetailState.busy,
                 max_length=2000,
-                class_name="mt-2 w-full rounded-md border border-white/10 bg-[#202226] px-3 py-2 text-xs text-zinc-200 focus:border-amber-400/50 outline-hidden",
+                class_name="mt-2 w-full rounded-md border border-black/10 bg-zinc-100 px-3 py-2 text-xs text-zinc-800 focus:border-amber-400/50 outline-hidden",
             ),
             rx.el.p(
                 DetailState.lifecycle_message,
@@ -256,14 +256,14 @@ def action_controls() -> rx.Component:
                     ),
                     rx.el.p(
                         DetailState.confirmation_text,
-                        class_name="mt-3 text-xs leading-6 text-zinc-200",
+                        class_name="mt-3 text-xs leading-6 text-zinc-800",
                     ),
                     rx.el.div(
                         rx.el.button(
                             "Cancel",
                             on_click=DetailState.cancel_confirmation,
                             disabled=DetailState.busy,
-                            class_name="rounded-md border border-white/20 px-4 py-2 text-xs text-zinc-200 hover:bg-white/5",
+                            class_name="rounded-md border border-black/10 px-4 py-2 text-xs text-zinc-800 hover:bg-black/5",
                         ),
                         rx.el.button(
                             "Confirm action",
@@ -287,7 +287,7 @@ def action_controls() -> rx.Component:
             ),
             class_name="p-5",
         ),
-        class_name="rounded-md border border-amber-400/20 bg-[#191b1e]",
+        class_name="rounded-md border border-amber-400/20 bg-white",
     )
 
 
@@ -298,7 +298,7 @@ def incident_detail_content() -> rx.Component:
                 rx.icon("arrow-left", class_name="h-3 w-3"),
                 "Back to incidents",
                 href="/incidents",
-                class_name="mb-5 flex w-fit items-center gap-2 text-xs text-zinc-400 hover:text-amber-300",
+                class_name="mb-5 flex w-fit items-center gap-2 text-xs text-zinc-600 hover:text-amber-300",
             ),
             rx.el.p(
                 "INVESTIGATE / AUTHORIZE / VERIFY",
@@ -306,7 +306,7 @@ def incident_detail_content() -> rx.Component:
             ),
             rx.el.h1(
                 "INCIDENT CONTROL",
-                class_name="font-['Barlow_Condensed'] text-4xl font-semibold tracking-wide text-zinc-100 sm:text-5xl",
+                class_name="font-['Barlow_Condensed'] text-4xl font-semibold tracking-wide text-zinc-900 sm:text-5xl",
             ),
             rx.el.p(
                 "Evidence-led response. Human oversight. Confirmed recovery.",
@@ -326,11 +326,11 @@ def incident_detail_content() -> rx.Component:
             rx.cond(
                 (DetailState.records.length() == 0) & DetailState.busy,
                 rx.el.div(
-                    class_name="m-5 h-24 animate-pulse rounded-sm bg-zinc-800/60"
+                    class_name="m-5 h-24 animate-pulse rounded-sm bg-zinc-200/60"
                 ),
             ),
             feedback("facts"),
-            class_name="mb-6 rounded-md border border-white/10 bg-[#1b1d20]",
+            class_name="mb-6 rounded-md border border-black/10 bg-zinc-50",
         ),
         rx.cond(
             DetailState.records.length() > 0,
@@ -357,7 +357,7 @@ def incident_detail_content() -> rx.Component:
         incident_logs_panel(),
         rx.el.footer(
             "Scoped by tenant · status, evidence, permissions and audit supplied by service",
-            class_name="py-6 text-[9px] text-zinc-600",
+            class_name="py-6 text-[9px] text-zinc-400",
         ),
         class_name="w-full",
     )

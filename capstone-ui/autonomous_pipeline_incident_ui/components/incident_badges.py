@@ -49,7 +49,7 @@ def status_badge(status: str) -> rx.Component:
                 "ESCALATED",
                 "inline-flex w-fit items-center gap-1.5 whitespace-nowrap rounded-sm border border-red-400/40 bg-red-400/15 px-2 py-1 text-[10px] font-semibold text-red-300",
             ),
-            "inline-flex w-fit items-center gap-1.5 whitespace-nowrap rounded-sm border border-zinc-500/20 bg-zinc-500/10 px-2 py-1 text-[10px] text-zinc-300",
+            "inline-flex w-fit items-center gap-1.5 whitespace-nowrap rounded-sm border border-zinc-500/20 bg-zinc-500/10 px-2 py-1 text-[10px] text-zinc-700",
         ),
     )
 
@@ -72,6 +72,6 @@ def severity_badge(severity: str) -> rx.Component:
                 "MEDIUM",
                 "inline-flex w-fit items-center gap-1.5 text-[10px] text-yellow-200",
             ),
-            "inline-flex w-fit items-center gap-1.5 text-[10px] text-zinc-400",
+            "inline-flex w-fit items-center gap-1.5 text-[10px] text-zinc-600",
         ),
     )

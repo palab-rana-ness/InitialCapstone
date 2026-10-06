@@ -41,6 +41,12 @@ class Settings(BaseSettings):
     newrelic_log_lookback_minutes: int = Field(default=60)
     newrelic_log_limit: int = Field(default=200)
 
+    # LangSmith tracing (observability for the LangGraph + LLM calls below).
+    langsmith_tracing: bool = Field(default=True)
+    langsmith_api_key: str = Field(default="")
+    langsmith_project: str = Field(default="capstone-incident")
+    langsmith_endpoint: str = Field(default="https://api.smith.langchain.com")
+
     log_level: str = Field(default="INFO")
 
 

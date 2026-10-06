@@ -15,30 +15,30 @@ def section_heading(number: str, title: str, caption: str) -> rx.Component:
             ),
             rx.el.h2(
                 title,
-                class_name="font-['Barlow_Condensed'] text-xl font-semibold uppercase tracking-wider text-zinc-100",
+                class_name="font-['Barlow_Condensed'] text-xl font-semibold uppercase tracking-wider text-zinc-900",
             ),
             class_name="flex items-center gap-3",
         ),
         rx.el.span(caption, class_name="text-[10px] text-zinc-500"),
-        class_name="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 px-5 py-4",
+        class_name="flex flex-wrap items-center justify-between gap-2 border-b border-black/10 px-5 py-4",
     )
 
 
 def metric_tile(metric: Metric) -> rx.Component:
     return rx.el.div(
         rx.el.p(
-            metric.label, class_name="text-[10px] font-medium text-zinc-400"
+            metric.label, class_name="text-[10px] font-medium text-zinc-600"
         ),
         rx.el.p(
             metric.value,
             class_name=rx.cond(
                 metric.label == "Awaiting approval",
                 "my-3 font-['Barlow_Condensed'] text-4xl font-medium tracking-tight text-amber-300",
-                "my-3 font-['Barlow_Condensed'] text-4xl font-medium tracking-tight text-zinc-100",
+                "my-3 font-['Barlow_Condensed'] text-4xl font-medium tracking-tight text-zinc-900",
             ),
         ),
         rx.el.p(metric.note, class_name="text-[9px] leading-4 text-zinc-500"),
-        class_name="w-full border border-white/10 bg-[#1b1d20] px-4 py-4 rounded-md",
+        class_name="w-full border border-black/10 bg-zinc-50 px-4 py-4 rounded-md",
     )
 
 
@@ -49,7 +49,7 @@ def pipeline_row(pipeline: Pipeline) -> rx.Component:
                 rx.icon("workflow", class_name="h-4 w-4 text-zinc-500"),
                 rx.el.span(
                     pipeline.name,
-                    class_name="text-xs font-medium text-zinc-200",
+                    class_name="text-xs font-medium text-zinc-800",
                 ),
                 class_name="flex items-center gap-2",
             ),
@@ -58,7 +58,7 @@ def pipeline_row(pipeline: Pipeline) -> rx.Component:
                 class_name=rx.cond(
                     pipeline.health < 90,
                     "font-mono text-xs text-amber-300",
-                    "font-mono text-xs text-zinc-300",
+                    "font-mono text-xs text-zinc-700",
                 ),
             ),
             class_name="flex items-center justify-between gap-3",
@@ -69,8 +69,8 @@ def pipeline_row(pipeline: Pipeline) -> rx.Component:
             aria_label=f"{pipeline.name} health",
             class_name=rx.cond(
                 pipeline.health < 90,
-                "my-3 block h-1.5 w-full overflow-hidden rounded-none bg-zinc-800 [&::-webkit-progress-bar]:bg-zinc-800 [&::-webkit-progress-value]:bg-amber-400 [&::-moz-progress-bar]:bg-amber-400",
-                "my-3 block h-1.5 w-full overflow-hidden rounded-none bg-zinc-800 [&::-webkit-progress-bar]:bg-zinc-800 [&::-webkit-progress-value]:bg-zinc-400 [&::-moz-progress-bar]:bg-zinc-400",
+                "my-3 block h-1.5 w-full overflow-hidden rounded-none bg-zinc-200 [&::-webkit-progress-bar]:bg-zinc-200 [&::-webkit-progress-value]:bg-amber-400 [&::-moz-progress-bar]:bg-amber-400",
+                "my-3 block h-1.5 w-full overflow-hidden rounded-none bg-zinc-200 [&::-webkit-progress-bar]:bg-zinc-200 [&::-webkit-progress-value]:bg-zinc-500 [&::-moz-progress-bar]:bg-zinc-500",
             ),
         ),
         rx.el.div(
@@ -80,12 +80,12 @@ def pipeline_row(pipeline: Pipeline) -> rx.Component:
                 class_name=rx.cond(
                     pipeline.health < 90,
                     "text-[10px] text-amber-300",
-                    "text-[10px] text-zinc-400",
+                    "text-[10px] text-zinc-600",
                 ),
             ),
             class_name="flex items-center justify-between gap-2",
         ),
-        class_name="border-b border-white/5 py-4 last:border-0",
+        class_name="border-b border-black/5 py-4 last:border-0",
     )
 
 
@@ -108,7 +108,7 @@ def pipeline_panel() -> rx.Component:
             rx.el.details(
                 rx.el.summary(
                     "Explore health comparison",
-                    class_name="cursor-pointer px-5 py-3 text-[10px] text-zinc-400 transition-colors hover:text-amber-300",
+                    class_name="cursor-pointer px-5 py-3 text-[10px] text-zinc-600 transition-colors hover:text-amber-300",
                 ),
                 rx.el.div(
                     reflex_xy.chart(
@@ -123,10 +123,10 @@ def pipeline_panel() -> rx.Component:
                     ),
                     class_name="mx-4 mb-4 overflow-x-auto rounded-sm bg-zinc-100 p-3 text-zinc-900",
                 ),
-                class_name="border-t border-white/10",
+                class_name="border-t border-black/10",
             ),
         ),
-        class_name="min-w-0 rounded-md border border-white/10 bg-[#191b1e]",
+        class_name="min-w-0 rounded-md border border-black/10 bg-white",
     )
 
 
@@ -140,7 +140,7 @@ def pipeline_run_panel() -> rx.Component:
             ),
             rx.el.p(
                 ScopeState.tenant_label,
-                class_name="text-sm text-zinc-200",
+                class_name="text-sm text-zinc-800",
             ),
             rx.el.p(
                 "Pipeline type",
@@ -157,7 +157,7 @@ def pipeline_run_panel() -> rx.Component:
                     on_change=PipelineRunState.set_pipeline_type,
                     disabled=PipelineRunState.busy
                     | (PipelineRunState.pipeline_types.length() == 0),
-                    class_name="w-full appearance-none rounded-md border border-white/10 bg-[#202226] px-3 py-2.5 pr-9 text-xs text-zinc-200 outline-hidden focus:border-amber-400 disabled:opacity-50",
+                    class_name="w-full appearance-none rounded-md border border-black/10 bg-zinc-100 px-3 py-2.5 pr-9 text-xs text-zinc-800 outline-hidden focus:border-amber-400 disabled:opacity-50",
                 ),
                 rx.icon(
                     "chevron-down",
@@ -188,7 +188,7 @@ def pipeline_run_panel() -> rx.Component:
                 PipelineRunState.status_text != "",
                 rx.el.p(
                     PipelineRunState.status_text,
-                    class_name="mt-4 text-xs text-zinc-300",
+                    class_name="mt-4 text-xs text-zinc-700",
                     role="status",
                 ),
             ),
@@ -224,7 +224,7 @@ def pipeline_run_panel() -> rx.Component:
                         PipelineRunState.result_details != "",
                         rx.el.p(
                             PipelineRunState.result_details,
-                            class_name="mt-2 text-xs leading-5 text-zinc-300",
+                            class_name="mt-2 text-xs leading-5 text-zinc-700",
                         ),
                     ),
                     rx.cond(
@@ -248,7 +248,7 @@ def pipeline_run_panel() -> rx.Component:
                             class_name="mt-3 inline-flex items-center gap-2 rounded-md border border-amber-400/30 bg-amber-400/5 px-3 py-2 text-xs text-amber-300 hover:bg-amber-400/10 disabled:opacity-40",
                         ),
                     ),
-                    class_name="mt-4 rounded-md border border-amber-400/20 bg-[#202226] p-3",
+                    class_name="mt-4 rounded-md border border-amber-400/20 bg-zinc-100 p-3",
                 ),
             ),
             rx.cond(
@@ -260,20 +260,20 @@ def pipeline_run_panel() -> rx.Component:
                     ),
                     rx.el.p(
                         PipelineRunState.diagnosis,
-                        class_name="mt-2 text-xs leading-5 text-zinc-200",
+                        class_name="mt-2 text-xs leading-5 text-zinc-800",
                     ),
                     rx.cond(
                         PipelineRunState.diagnosis_details != "",
                         rx.el.p(
                             PipelineRunState.diagnosis_details,
-                            class_name="mt-2 text-xs leading-5 text-zinc-400",
+                            class_name="mt-2 text-xs leading-5 text-zinc-600",
                         ),
                     ),
                     rx.el.button(
                         "Fix",
                         rx.icon("wrench", class_name="h-4 w-4"),
                         on_click=PipelineRunState.fix_placeholder,
-                        class_name="mt-3 inline-flex items-center gap-2 rounded-md border border-white/15 bg-[#1b1d20] px-3 py-2 text-xs text-zinc-300 hover:text-amber-300",
+                        class_name="mt-3 inline-flex items-center gap-2 rounded-md border border-black/10 bg-zinc-50 px-3 py-2 text-xs text-zinc-700 hover:text-amber-300",
                     ),
                     rx.cond(
                         PipelineRunState.fix_note != "",
@@ -282,7 +282,7 @@ def pipeline_run_panel() -> rx.Component:
                             class_name="mt-2 text-[11px] text-zinc-500",
                         ),
                     ),
-                    class_name="mt-4 rounded-md border border-white/10 bg-[#202226] p-3",
+                    class_name="mt-4 rounded-md border border-black/10 bg-zinc-100 p-3",
                 ),
             ),
             rx.cond(
@@ -298,11 +298,11 @@ def pipeline_run_panel() -> rx.Component:
                             rx.el.div(
                                 rx.el.span(
                                     entry.pipeline,
-                                    class_name="text-xs font-medium text-zinc-200",
+                                    class_name="text-xs font-medium text-zinc-800",
                                 ),
                                 rx.el.span(
                                     entry.status,
-                                    class_name="rounded border border-white/10 px-1.5 py-0.5 text-[10px] uppercase text-zinc-400",
+                                    class_name="rounded border border-black/10 px-1.5 py-0.5 text-[10px] uppercase text-zinc-600",
                                 ),
                                 class_name="flex items-center justify-between gap-2",
                             ),
@@ -326,7 +326,7 @@ def pipeline_run_panel() -> rx.Component:
                                         entry.root_cause != "",
                                         rx.el.p(
                                             "Root cause: " + entry.root_cause,
-                                            class_name="mt-2 text-xs text-zinc-300",
+                                            class_name="mt-2 text-xs text-zinc-700",
                                         ),
                                     ),
                                     rx.cond(
@@ -340,7 +340,7 @@ def pipeline_run_panel() -> rx.Component:
                                                 entry.recent_logs,
                                                 lambda log: rx.el.p(
                                                     log,
-                                                    class_name="text-[11px] leading-5 text-zinc-400",
+                                                    class_name="text-[11px] leading-5 text-zinc-600",
                                                 ),
                                             ),
                                         ),
@@ -356,9 +356,29 @@ def pipeline_run_panel() -> rx.Component:
                                                 entry.remedies,
                                                 lambda remedy: rx.el.p(
                                                     remedy.action + " — " + remedy.explanation,
-                                                    class_name="text-[11px] leading-5 text-zinc-400",
+                                                    class_name="text-[11px] leading-5 text-zinc-600",
                                                 ),
                                             ),
+                                        ),
+                                    ),
+                                    rx.cond(
+                                        entry.status == "AWAITING_APPROVAL",
+                                        rx.el.div(
+                                            rx.el.button(
+                                                "Approve & Execute",
+                                                rx.icon("check", class_name="h-3.5 w-3.5"),
+                                                on_click=PipelineRunState.approve_history_remediation(entry.incident_id),
+                                                disabled=PipelineRunState.decision_loading,
+                                                class_name="inline-flex items-center gap-1.5 rounded-md border border-green-400/30 bg-green-400/5 px-2.5 py-1.5 text-[11px] text-green-300 hover:bg-green-400/10 disabled:opacity-40",
+                                            ),
+                                            rx.el.button(
+                                                "Reject",
+                                                rx.icon("x", class_name="h-3.5 w-3.5"),
+                                                on_click=PipelineRunState.reject_history_remediation(entry.incident_id),
+                                                disabled=PipelineRunState.decision_loading,
+                                                class_name="inline-flex items-center gap-1.5 rounded-md border border-red-400/30 bg-red-400/5 px-2.5 py-1.5 text-[11px] text-red-300 hover:bg-red-400/10 disabled:opacity-40",
+                                            ),
+                                            class_name="mt-3 flex items-center gap-2",
                                         ),
                                     ),
                                     rx.cond(
@@ -375,10 +395,10 @@ def pipeline_run_panel() -> rx.Component:
                                             class_name="mt-3 inline-flex items-center gap-1.5 rounded-md border border-green-400/30 bg-green-400/5 px-2.5 py-1.5 text-[11px] text-green-300 hover:bg-green-400/10 disabled:opacity-40",
                                         ),
                                     ),
-                                    class_name="mt-1 border-t border-white/5 pt-2",
+                                    class_name="mt-1 border-t border-black/5 pt-2",
                                 ),
                             ),
-                            class_name="mt-2 rounded-md border border-white/10 bg-[#1b1d20] p-3",
+                            class_name="mt-2 rounded-md border border-black/10 bg-zinc-50 p-3",
                         ),
                     ),
                     class_name="mt-2",
@@ -386,14 +406,14 @@ def pipeline_run_panel() -> rx.Component:
             ),
             class_name="p-5",
         ),
-        class_name="mt-6 rounded-md border border-white/10 bg-[#191b1e]",
+        class_name="mt-6 rounded-md border border-black/10 bg-white",
     )
 
 
 def empty_panel(title: str, description: str) -> rx.Component:
     return rx.el.div(
         rx.icon("scan-line", class_name="mb-3 h-7 w-7 text-zinc-500"),
-        rx.el.p(title, class_name="text-sm font-medium text-zinc-200"),
+        rx.el.p(title, class_name="text-sm font-medium text-zinc-800"),
         rx.el.p(
             description,
             class_name="mt-2 max-w-md text-center text-xs leading-5 text-zinc-500",
@@ -416,24 +436,24 @@ def briefing_panel() -> rx.Component:
             ),
             rx.el.h3(
                 DashboardState.summary,
-                class_name="mt-5 font-['Barlow_Condensed'] text-3xl font-medium leading-tight text-zinc-100",
+                class_name="mt-5 font-['Barlow_Condensed'] text-3xl font-medium leading-tight text-zinc-900",
             ),
             rx.el.p(
                 "A consolidated view of detection, response, and recovery. Statuses reflect the latest confirmed service response.",
-                class_name="mt-4 text-xs leading-6 text-zinc-400",
+                class_name="mt-4 text-xs leading-6 text-zinc-600",
             ),
             rx.el.div(
                 rx.el.div(
                     rx.el.span("Reporting window", class_name="text-zinc-500"),
                     rx.el.span(
-                        DashboardState.window, class_name="text-zinc-200"
+                        DashboardState.window, class_name="text-zinc-800"
                     ),
                     class_name="flex justify-between gap-2",
                 ),
                 rx.el.div(
                     rx.el.span("Platform", class_name="text-zinc-500"),
                     rx.el.span(
-                        ScopeState.platform_label, class_name="text-zinc-200"
+                        ScopeState.platform_label, class_name="text-zinc-800"
                     ),
                     class_name="flex justify-between gap-2",
                 ),
@@ -441,11 +461,11 @@ def briefing_panel() -> rx.Component:
                     rx.el.span("Last synchronized", class_name="text-zinc-500"),
                     rx.el.span(
                         DashboardState.updated_at,
-                        class_name="font-mono text-zinc-200",
+                        class_name="font-mono text-zinc-800",
                     ),
                     class_name="flex justify-between gap-2",
                 ),
-                class_name="mt-7 flex flex-col gap-4 border-t border-white/10 pt-5 text-[11px]",
+                class_name="mt-7 flex flex-col gap-4 border-t border-black/10 pt-5 text-[11px]",
             ),
             rx.el.div(
                 rx.icon(
@@ -453,13 +473,13 @@ def briefing_panel() -> rx.Component:
                 ),
                 rx.el.p(
                     "Human oversight stays in the loop. Approval and execution are managed by the service.",
-                    class_name="text-[10px] leading-5 text-zinc-400",
+                    class_name="text-[10px] leading-5 text-zinc-600",
                 ),
                 class_name="mt-6 flex gap-3 border-l-2 border-amber-400/60 bg-amber-400/5 p-3",
             ),
             class_name="p-5",
         ),
-        class_name="rounded-md border border-white/10 bg-[#191b1e]",
+        class_name="rounded-md border border-black/10 bg-white",
     )
 
 
@@ -467,19 +487,19 @@ def incident_row(incident: Incident) -> rx.Component:
     return rx.el.tr(
         rx.el.td(
             incident.id,
-            class_name="whitespace-nowrap px-5 py-4 font-mono text-xs text-zinc-200",
+            class_name="whitespace-nowrap px-5 py-4 font-mono text-xs text-zinc-800",
         ),
         rx.el.td(
             incident.pipeline,
-            class_name="whitespace-nowrap px-4 py-4 text-xs text-zinc-300",
+            class_name="whitespace-nowrap px-4 py-4 text-xs text-zinc-700",
         ),
         rx.el.td(
             incident.tenant,
-            class_name="whitespace-nowrap px-4 py-4 text-xs text-zinc-300",
+            class_name="whitespace-nowrap px-4 py-4 text-xs text-zinc-700",
         ),
         rx.el.td(
             incident.platform,
-            class_name="whitespace-nowrap px-4 py-4 text-xs text-zinc-300",
+            class_name="whitespace-nowrap px-4 py-4 text-xs text-zinc-700",
         ),
         rx.el.td(
             severity_badge(incident.severity),
@@ -511,7 +531,7 @@ def incident_row(incident: Incident) -> rx.Component:
             ),
             class_name="whitespace-nowrap px-5 py-4",
         ),
-        class_name="border-t border-white/5 odd:bg-white/[0.015] transition-colors hover:bg-white/[0.04]",
+        class_name="border-t border-black/5 odd:bg-black/[0.015] transition-colors hover:bg-black/[0.04]",
     )
 
 
@@ -557,7 +577,7 @@ def incidents_panel() -> rx.Component:
                 "No incidents were returned for the selected tenant and platform.",
             ),
         ),
-        class_name="mt-6 overflow-hidden rounded-md border border-white/10 bg-[#191b1e]",
+        class_name="mt-6 overflow-hidden rounded-md border border-black/10 bg-white",
     )
 
 
@@ -569,7 +589,7 @@ def loading_panel() -> rx.Component:
                 class_name="h-4 w-4 animate-spin text-amber-400",
             ),
             rx.el.p(
-                DashboardState.feedback, class_name="text-xs text-zinc-400"
+                DashboardState.feedback, class_name="text-xs text-zinc-600"
             ),
             class_name="mb-5 flex items-center gap-2",
             role="status",
@@ -578,17 +598,17 @@ def loading_panel() -> rx.Component:
             rx.foreach(
                 rx.Var.range(7),
                 lambda _: rx.el.div(
-                    class_name="h-32 animate-pulse rounded-md border border-white/5 bg-zinc-800/70"
+                    class_name="h-32 animate-pulse rounded-md border border-black/5 bg-zinc-200/70"
                 ),
             ),
             class_name="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7",
         ),
         rx.el.div(
             rx.el.div(
-                class_name="h-96 animate-pulse rounded-md bg-zinc-800/60 lg:col-span-2"
+                class_name="h-96 animate-pulse rounded-md bg-zinc-200/60 lg:col-span-2"
             ),
             rx.el.div(
-                class_name="h-96 animate-pulse rounded-md bg-zinc-800/40"
+                class_name="h-96 animate-pulse rounded-md bg-zinc-200/40"
             ),
             class_name="mt-6 grid gap-6 lg:grid-cols-3",
         ),
@@ -606,7 +626,7 @@ def dashboard_content() -> rx.Component:
                 ),
                 rx.el.h1(
                     "OPERATIONS OVERVIEW",
-                    class_name="font-['Barlow_Condensed'] text-4xl font-semibold tracking-wide text-zinc-100 sm:text-5xl",
+                    class_name="font-['Barlow_Condensed'] text-4xl font-semibold tracking-wide text-zinc-900 sm:text-5xl",
                 ),
                 rx.el.p(
                     "Every pipeline. Every incident. One operational picture.",
@@ -629,7 +649,7 @@ def dashboard_content() -> rx.Component:
                 ),
                 on_click=DashboardState.refresh_dashboard,
                 disabled=DashboardState.busy,
-                class_name="flex items-center gap-2 rounded-md border border-white/15 bg-[#202226] px-4 py-2.5 text-xs font-medium text-zinc-200 transition-colors hover:border-amber-400/50 hover:text-amber-300 disabled:cursor-wait disabled:opacity-50",
+                class_name="flex items-center gap-2 rounded-md border border-black/10 bg-zinc-100 px-4 py-2.5 text-xs font-medium text-zinc-800 transition-colors hover:border-amber-400/50 hover:text-amber-300 disabled:cursor-wait disabled:opacity-50",
             ),
             class_name="flex flex-wrap items-center justify-between gap-5 py-8",
         ),
@@ -639,11 +659,11 @@ def dashboard_content() -> rx.Component:
                 rx.icon("triangle-alert", class_name="h-8 w-8 text-amber-400"),
                 rx.el.h2(
                     DashboardState.error_title,
-                    class_name="mt-4 text-lg font-semibold text-zinc-100",
+                    class_name="mt-4 text-lg font-semibold text-zinc-900",
                 ),
                 rx.el.p(
                     DashboardState.error_description,
-                    class_name="mt-2 max-w-lg text-sm leading-6 text-zinc-400",
+                    class_name="mt-2 max-w-lg text-sm leading-6 text-zinc-600",
                 ),
                 rx.el.button(
                     "Retry connection",
@@ -652,7 +672,7 @@ def dashboard_content() -> rx.Component:
                     disabled=DashboardState.busy,
                     class_name="mt-6 flex items-center gap-3 rounded-md bg-amber-400 px-4 py-2.5 text-xs font-semibold text-zinc-950 hover:bg-amber-300",
                 ),
-                class_name="rounded-md border border-amber-400/20 bg-[#1b1d20] p-8",
+                class_name="rounded-md border border-amber-400/20 bg-zinc-50 p-8",
                 role="alert",
             ),
             rx.cond(
@@ -707,11 +727,11 @@ def dashboard_content() -> rx.Component:
         rx.el.footer(
             rx.el.span(
                 "SENTINEL / OPERATIONS INTELLIGENCE",
-                class_name="text-[8px] tracking-[0.16em] text-zinc-600",
+                class_name="text-[8px] tracking-[0.16em] text-zinc-400",
             ),
             rx.el.span(
                 "Scoped by tenant. Reported by service.",
-                class_name="text-[9px] text-zinc-600",
+                class_name="text-[9px] text-zinc-400",
             ),
             class_name="flex flex-wrap justify-between gap-3 py-6",
         ),

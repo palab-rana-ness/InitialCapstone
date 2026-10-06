@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app import db_incidents, store
+from app.database import workflow_repository
 from app.database.connection import get_db
 from app.models_db import IncidentDB
 from app.schemas import (
@@ -70,6 +71,24 @@ def list_tenant_incidents(
         db, tenant_id=tenant_id, platform_id=platform_id
     )
     return IncidentListResponse(items=items)
+
+
+@router.get("/{tenant_id}/incidents/history")
+def get_pipeline_failure_history(
+    tenant_id: str,
+    pipeline: str,
+    limit: int = Query(default=5, ge=1, le=50),
+    db: Session = Depends(get_db),
+):
+    """'What happened the last N times this pipeline failed?' - long-term relational
+    memory backing Agent 2/3's RCA grounding, surfaced for the UI/operators."""
+    return {
+        "tenant_id": tenant_id,
+        "pipeline": pipeline,
+        "items": workflow_repository.history_for_pipeline(
+            db, tenant_id=tenant_id, pipeline=pipeline, limit=limit
+        ),
+    }
 
 
 def _get_or_create_platform_config(

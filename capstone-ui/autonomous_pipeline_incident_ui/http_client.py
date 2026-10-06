@@ -399,10 +399,52 @@ async def resolve_incident_json(incident_id: str) -> object:
     )
 
 
+async def remediation_decision_json(
+    incident_id: str, decision: str, decided_by: str
+) -> object:
+    """Human approval gate: approve or reject the proposed remediation plan.
+    Executes nothing - just records the decision (see RemediationDecisionRequest)."""
+    if decision not in {"approve", "reject"}:
+        raise ServiceError("request_invalid")
+    return await json_request(
+        f"/api/v1/incidents/{segment(incident_id)}/remediation/{decision}",
+        {},
+        "POST",
+        {"decided_by": decided_by},
+    )
+
+
 async def pipeline_history_json(tenant: str) -> object:
     """List recent pipeline-run incidents (history) for a tenant."""
     return await json_request(
         "/api/v1/incidents",
         {"tenant_id": tenant},
+        "GET",
+    )
+
+
+async def pipeline_run_start_backend_json(
+    tenant: str,
+    platform: str,
+    pipeline: str,
+    idempotency_key: str = "",
+) -> object:
+    """Agent 1 (Pipeline Agent): capstone-ui's own backend starts the run and owns
+    all polling/failure-handoff server-side. Never calls DataPipeline directly."""
+    return await json_request(
+        "/api/v1/incidents/pipeline-run/start",
+        {},
+        "POST",
+        {"tenant_id": tenant, "platform_id": platform, "pipeline": pipeline},
+        idempotency_key,
+    )
+
+
+async def pipeline_run_status_backend_json(workflow_run_id: str) -> object:
+    """Fast local-DB-only poll of capstone-ui's own backend; never calls
+    DataPipeline/AiDiagnosis directly."""
+    return await json_request(
+        f"/api/v1/incidents/pipeline-run/{segment(workflow_run_id)}/status",
+        {},
         "GET",
     )

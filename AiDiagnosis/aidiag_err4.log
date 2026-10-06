@@ -144,3 +144,62 @@ INFO:app.graph.nodes:Retrieved 1 similar incidents for tenant tenant_002
 INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 INFO:app.graph.nodes:Stored incident memory for 20261001_101842_6e0cbc
+INFO:app.graph.nodes:Validated trigger INC-BDD33315 for tenant tenant_001
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident INC-BDD33315
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 0 log lines from New Relic for incident INC-BDD33315
+INFO:app.graph.nodes:Validated trigger INC-31E3B3D2 for tenant tenant_002
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident INC-31E3B3D2
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 0 log lines from New Relic for incident INC-31E3B3D2
+INFO:app.graph.nodes:Validated trigger INC-44CE982D for tenant tenant_001
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident INC-44CE982D
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 0 log lines from New Relic for incident INC-44CE982D
+INFO:app.graph.nodes:Validated trigger TEST-VERIFY-PIPELINE-ID for tenant tenant_002
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident TEST-VERIFY-PIPELINE-ID
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 200 log lines from New Relic for incident TEST-VERIFY-PIPELINE-ID
+INFO:app.graph.nodes:Validated incident TEST-VERIFY-PIPELINE-ID for tenant tenant_002
+INFO:app.graph.nodes:Retrieved 2 similar incidents for tenant tenant_002
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Stored incident memory for TEST-VERIFY-PIPELINE-ID
+INFO:app.graph.nodes:Validated trigger INC-31E3B3D2 for tenant tenant_002
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident INC-31E3B3D2
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 200 log lines from New Relic for incident INC-31E3B3D2
+INFO:app.graph.nodes:Validated incident INC-31E3B3D2 for tenant tenant_002
+INFO:app.graph.nodes:Retrieved 3 similar incidents for tenant tenant_002
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Stored incident memory for INC-31E3B3D2
+INFO:app.graph.nodes:Validated trigger INC-44CE982D for tenant tenant_001
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident INC-44CE982D
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 200 log lines from New Relic for incident INC-44CE982D
+INFO:app.graph.nodes:Validated incident INC-44CE982D for tenant tenant_001
+INFO:app.graph.nodes:Retrieved 0 similar incidents for tenant tenant_001
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+INFO:groq._base_client:Retrying request to /openai/v1/chat/completions in 2.000000 seconds
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Stored incident memory for INC-44CE982D
+INFO:app.graph.nodes:Validated trigger INC-CD601AC6 for tenant tenant_002
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident INC-CD601AC6
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 200 log lines from New Relic for incident INC-CD601AC6
+INFO:app.graph.nodes:Validated incident INC-CD601AC6 for tenant tenant_002
+INFO:app.graph.nodes:Retrieved 4 similar incidents for tenant tenant_002
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Stored incident memory for INC-CD601AC6
+INFO:app.graph.nodes:Validated trigger INC-6666E6D8 for tenant tenant_002
+INFO:app.graph.nodes:Resolved adapter 'spark' for incident INC-6666E6D8
+INFO:httpx:HTTP Request: POST https://api.newrelic.com/graphql "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Fetched 200 log lines from New Relic for incident INC-6666E6D8
+INFO:app.graph.nodes:Validated incident INC-6666E6D8 for tenant tenant_002
+INFO:app.graph.nodes:Retrieved 5 similar incidents for tenant tenant_002
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:app.graph.nodes:Stored incident memory for INC-6666E6D8

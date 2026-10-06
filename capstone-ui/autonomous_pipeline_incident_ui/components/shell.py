@@ -16,7 +16,7 @@ def navigation(active: str = "Dashboard") -> rx.Component:
             class_name=rx.cond(
                 active == "Dashboard",
                 "flex items-center gap-3 border-l-2 border-amber-400 bg-amber-400/10 px-5 py-3 text-sm font-medium text-amber-300",
-                "flex items-center gap-3 border-l-2 border-transparent px-5 py-3 text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100",
+                "flex items-center gap-3 border-l-2 border-transparent px-5 py-3 text-sm text-zinc-600 transition-colors hover:bg-black/5 hover:text-zinc-900",
             ),
             aria_current=rx.cond(active == "Dashboard", "page", "false"),
         ),
@@ -24,13 +24,13 @@ def navigation(active: str = "Dashboard") -> rx.Component:
             rx.icon("list-filter", class_name="h-4 w-4"),
             "Incidents",
             rx.icon(
-                "arrow-up-right", class_name="ml-auto h-3 w-3 text-zinc-600"
+                "arrow-up-right", class_name="ml-auto h-3 w-3 text-zinc-400"
             ),
             href="/incidents",
             class_name=rx.cond(
                 active == "Incidents",
                 "flex items-center gap-3 border-l-2 border-amber-400 bg-amber-400/10 px-5 py-3 text-sm font-medium text-amber-300",
-                "flex items-center gap-3 border-l-2 border-transparent px-5 py-3 text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100",
+                "flex items-center gap-3 border-l-2 border-transparent px-5 py-3 text-sm text-zinc-600 transition-colors hover:bg-black/5 hover:text-zinc-900",
             ),
             aria_current=rx.cond(active == "Incidents", "page", "false"),
             title="Incidents workspace",
@@ -42,7 +42,7 @@ def navigation(active: str = "Dashboard") -> rx.Component:
             class_name=rx.cond(
                 active == "Configuration",
                 "flex items-center gap-3 border-l-2 border-amber-400 bg-amber-400/10 px-5 py-3 text-sm font-medium text-amber-300",
-                "flex items-center gap-3 border-l-2 border-transparent px-5 py-3 text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100",
+                "flex items-center gap-3 border-l-2 border-transparent px-5 py-3 text-sm text-zinc-600 transition-colors hover:bg-black/5 hover:text-zinc-900",
             ),
             aria_current=rx.cond(active == "Configuration", "page", "false"),
             title="Configuration workspace",
@@ -75,7 +75,7 @@ def scope_controls() -> rx.Component:
                     | DetailState.busy
                     | ConfigState.busy
                     | PipelineRunState.busy,
-                    class_name="w-full appearance-none bg-transparent py-1 pr-6 text-sm text-zinc-200 outline-hidden disabled:cursor-wait [&>option]:bg-zinc-900",
+                    class_name="w-full appearance-none bg-transparent py-1 pr-6 text-sm text-zinc-800 outline-hidden disabled:cursor-wait [&>option]:bg-white",
                 ),
                 rx.icon(
                     "chevron-down",
@@ -85,7 +85,7 @@ def scope_controls() -> rx.Component:
             ),
             class_name="min-w-32 flex-1",
         ),
-        rx.el.div(class_name="h-8 w-px bg-white/10"),
+        rx.el.div(class_name="h-8 w-px bg-black/10"),
         rx.el.div(
             rx.el.label(
                 "PLATFORM",
@@ -108,7 +108,7 @@ def scope_controls() -> rx.Component:
                     | DetailState.busy
                     | ConfigState.busy
                     | PipelineRunState.busy,
-                    class_name="w-full appearance-none bg-transparent py-1 pr-6 text-sm text-zinc-200 outline-hidden disabled:cursor-wait [&>option]:bg-zinc-900",
+                    class_name="w-full appearance-none bg-transparent py-1 pr-6 text-sm text-zinc-800 outline-hidden disabled:cursor-wait [&>option]:bg-white",
                 ),
                 rx.icon(
                     "chevron-down",
@@ -118,7 +118,7 @@ def scope_controls() -> rx.Component:
             ),
             class_name="min-w-28 flex-1",
         ),
-        class_name="flex w-full flex-wrap items-center gap-5 rounded-md border border-white/10 bg-[#1b1d20] px-4 py-2 sm:w-auto",
+        class_name="flex w-full flex-wrap items-center gap-5 rounded-md border border-black/10 bg-zinc-50 px-4 py-2 sm:w-auto",
     )
 
 
@@ -133,7 +133,7 @@ def shell(content: rx.Component, active: str = "Dashboard") -> rx.Component:
                 rx.el.div(
                     rx.el.span(
                         "SENTINEL",
-                        class_name="font-['Barlow_Condensed'] text-2xl font-semibold tracking-[0.16em] text-zinc-100",
+                        class_name="font-['Barlow_Condensed'] text-2xl font-semibold tracking-[0.16em] text-zinc-900",
                     ),
                     rx.el.p(
                         "AUTONOMOUS OPERATIONS",
@@ -150,17 +150,17 @@ def shell(content: rx.Component, active: str = "Dashboard") -> rx.Component:
                 ),
                 rx.el.span(
                     "01",
-                    class_name="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-zinc-800 text-xs text-zinc-300",
+                    class_name="flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-zinc-200 text-xs text-zinc-700",
                 ),
                 class_name="flex items-center gap-6",
             ),
-            class_name="flex h-[76px] shrink-0 items-center justify-between border-b border-white/10 bg-[#17191c] px-5 lg:px-7",
+            class_name="flex h-[76px] shrink-0 items-center justify-between border-b border-black/10 bg-zinc-50 px-5 lg:px-7",
         ),
         rx.el.div(
             rx.el.aside(
                 rx.el.p(
                     "WORKSPACE",
-                    class_name="px-5 pb-4 pt-8 text-[9px] font-semibold tracking-[0.2em] text-zinc-600",
+                    class_name="px-5 pb-4 pt-8 text-[9px] font-semibold tracking-[0.2em] text-zinc-400",
                 ),
                 navigation(active),
                 rx.el.div(
@@ -169,28 +169,28 @@ def shell(content: rx.Component, active: str = "Dashboard") -> rx.Component:
                     ),
                     rx.el.p(
                         "Built for oversight.",
-                        class_name="text-xs text-zinc-300",
+                        class_name="text-xs text-zinc-700",
                     ),
                     rx.el.p(
                         "Autonomous response.\nHuman control.",
                         class_name="mt-2 whitespace-pre-line text-[11px] leading-5 text-zinc-500",
                     ),
-                    class_name="mx-5 mt-auto border-t border-white/10 py-6",
+                    class_name="mx-5 mt-auto border-t border-black/10 py-6",
                 ),
-                class_name="hidden w-56 shrink-0 flex-col border-r border-white/10 bg-[#17191c] md:flex",
+                class_name="hidden w-56 shrink-0 flex-col border-r border-black/10 bg-zinc-50 md:flex",
             ),
             rx.el.main(
                 rx.el.div(
                     rx.el.div(
                         rx.el.span("Workspace", class_name="text-zinc-500"),
                         rx.icon(
-                            "chevron-right", class_name="h-3 w-3 text-zinc-600"
+                            "chevron-right", class_name="h-3 w-3 text-zinc-400"
                         ),
-                        rx.el.span(active, class_name="text-zinc-300"),
+                        rx.el.span(active, class_name="text-zinc-700"),
                         class_name="flex items-center gap-2 text-xs",
                     ),
                     scope_controls(),
-                    class_name="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5",
+                    class_name="flex flex-wrap items-center justify-between gap-4 border-b border-black/10 pb-5",
                 ),
                 rx.el.div(navigation(active), class_name="mt-4 md:hidden"),
                 content,
@@ -198,5 +198,5 @@ def shell(content: rx.Component, active: str = "Dashboard") -> rx.Component:
             ),
             class_name="flex min-h-0 flex-1",
         ),
-        class_name="flex h-dvh w-full flex-col overflow-hidden bg-[#121416] font-['Inter'] text-zinc-200 selection:bg-amber-400/30",
+        class_name="flex h-dvh w-full flex-col overflow-hidden bg-white font-['Inter'] text-zinc-800 selection:bg-amber-400/30",
     )

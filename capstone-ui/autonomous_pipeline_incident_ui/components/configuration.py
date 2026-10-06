@@ -12,7 +12,7 @@ def rule_control(
         rx.el.label(
             label,
             html_for=field,
-            class_name="mb-2 block text-xs font-medium text-zinc-200",
+            class_name="mb-2 block text-xs font-medium text-zinc-800",
         ),
         rx.el.div(
             rx.el.select(
@@ -30,7 +30,7 @@ def rule_control(
                     field, selected
                 ),
                 disabled=~ConfigState.editable,
-                class_name="w-full appearance-none rounded-md border border-white/10 bg-[#202226] px-3 py-3 pr-9 text-xs text-zinc-200 outline-hidden focus:border-amber-400 disabled:opacity-50",
+                class_name="w-full appearance-none rounded-md border border-black/10 bg-zinc-100 px-3 py-3 pr-9 text-xs text-zinc-800 outline-hidden focus:border-amber-400 disabled:opacity-50",
             ),
             rx.icon(
                 "chevron-down",
@@ -51,7 +51,7 @@ def action_control(action: str) -> rx.Component:
             class_name=rx.cond(
                 ConfigState.draft.allowed_actions.contains(action),
                 "h-4 w-4 text-amber-300",
-                "h-4 w-4 text-zinc-700",
+                "h-4 w-4 text-zinc-300",
             ),
         ),
         action,
@@ -62,7 +62,7 @@ def action_control(action: str) -> rx.Component:
         class_name=rx.cond(
             ConfigState.draft.allowed_actions.contains(action),
             "flex items-center gap-3 rounded-md border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-xs text-amber-300 disabled:opacity-50",
-            "flex items-center gap-3 rounded-md border border-white/10 bg-[#202226] px-4 py-3 text-xs text-zinc-400 hover:border-amber-400/30 disabled:opacity-50",
+            "flex items-center gap-3 rounded-md border border-black/10 bg-zinc-100 px-4 py-3 text-xs text-zinc-600 hover:border-amber-400/30 disabled:opacity-50",
         ),
     )
 
@@ -85,7 +85,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                         default_value=record.tenant_id,
                         key=record.tenant_id,
                         read_only=True,
-                        class_name="w-full rounded-md border border-white/10 bg-[#121416] p-3 font-mono text-xs text-zinc-300",
+                        class_name="w-full rounded-md border border-black/10 bg-white p-3 font-mono text-xs text-zinc-700",
                     ),
                 ),
                 rx.el.div(
@@ -95,7 +95,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                     ),
                     rx.el.p(
                         ScopeState.platform_label,
-                        class_name="text-sm text-zinc-200",
+                        class_name="text-sm text-zinc-800",
                     ),
                     rx.el.p(
                         "Use the shared Platform selector above to change workspace.",
@@ -104,7 +104,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                 ),
                 class_name="grid gap-6 p-5 sm:grid-cols-2",
             ),
-            class_name="rounded-md border border-white/10 bg-[#191b1e]",
+            class_name="rounded-md border border-black/10 bg-white",
         ),
         rx.el.div(
             rx.el.section(
@@ -114,7 +114,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                         rx.el.div(
                             rx.el.p(
                                 "Monitoring enabled",
-                                class_name="text-sm text-zinc-200",
+                                class_name="text-sm text-zinc-800",
                             ),
                             rx.el.p(
                                 "Collect signals for this tenant and platform.",
@@ -133,7 +133,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                             aria_pressed=ConfigState.draft.monitoring_enabled,
                             class_name="flex items-center gap-2 rounded-md border border-amber-400/30 bg-amber-400/5 px-3 py-2 text-xs text-amber-300 disabled:opacity-50",
                         ),
-                        class_name="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5",
+                        class_name="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-black/10 pb-5",
                     ),
                     rule_control(
                         "Check interval (seconds)",
@@ -165,7 +165,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                     ),
                     class_name="flex flex-col gap-5 p-5",
                 ),
-                class_name="min-w-0 rounded-md border border-white/10 bg-[#191b1e]",
+                class_name="min-w-0 rounded-md border border-black/10 bg-white",
             ),
             rx.el.section(
                 section_heading("03", "Remediation policy", "HUMAN OVERSIGHT"),
@@ -173,7 +173,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                     rx.el.label(
                         "Remediation Policy",
                         html_for="config-policy",
-                        class_name="mb-2 block text-xs text-zinc-200",
+                        class_name="mb-2 block text-xs text-zinc-800",
                     ),
                     rx.el.div(
                         rx.el.select(
@@ -187,7 +187,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                             value=ConfigState.draft.remediation_policy,
                             on_change=ConfigState.set_policy,
                             disabled=~ConfigState.editable,
-                            class_name="w-full appearance-none rounded-md border border-white/10 bg-[#202226] px-3 py-3 pr-9 text-xs text-zinc-200 outline-hidden focus:border-amber-400 disabled:opacity-50",
+                            class_name="w-full appearance-none rounded-md border border-black/10 bg-zinc-100 px-3 py-3 pr-9 text-xs text-zinc-800 outline-hidden focus:border-amber-400 disabled:opacity-50",
                         ),
                         rx.icon(
                             "chevron-down",
@@ -197,7 +197,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                     ),
                     rx.el.p(
                         "Allowed Actions",
-                        class_name="mb-3 mt-7 text-xs text-zinc-200",
+                        class_name="mb-3 mt-7 text-xs text-zinc-800",
                     ),
                     rx.el.div(
                         rx.foreach(
@@ -216,7 +216,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                         ),
                         rx.el.p(
                             "Editing settings does not authorize execution. The service validates access, policy and permitted actions on every save and remediation request.",
-                            class_name="text-xs leading-6 text-zinc-400",
+                            class_name="text-xs leading-6 text-zinc-600",
                         ),
                         class_name="mt-7 flex gap-3 border-l-2 border-amber-400/50 bg-amber-400/5 p-4",
                     ),
@@ -229,7 +229,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                     ),
                     class_name="p-5",
                 ),
-                class_name="min-w-0 rounded-md border border-white/10 bg-[#191b1e]",
+                class_name="min-w-0 rounded-md border border-black/10 bg-white",
             ),
             class_name="grid items-start gap-6 lg:grid-cols-2",
         ),
@@ -253,7 +253,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                     "Reset to confirmed",
                     on_click=ConfigState.reset_edits,
                     disabled=ConfigState.busy | (~ConfigState.dirty),
-                    class_name="rounded-md border border-white/15 px-4 py-3 text-xs text-zinc-300 hover:text-amber-300 disabled:opacity-40",
+                    class_name="rounded-md border border-black/10 px-4 py-3 text-xs text-zinc-700 hover:text-amber-300 disabled:opacity-40",
                 ),
                 rx.el.button(
                     rx.cond(
@@ -274,7 +274,7 @@ def configuration_form(record: ConfigurationResponse) -> rx.Component:
                 ),
                 class_name="flex flex-wrap gap-3",
             ),
-            class_name="flex flex-wrap items-center justify-between gap-5 rounded-md border border-white/10 bg-[#1b1d20] p-5",
+            class_name="flex flex-wrap items-center justify-between gap-5 rounded-md border border-black/10 bg-zinc-50 p-5",
         ),
         rx.el.p(
             f"Revision {record.revision} · Last confirmed {record.updated_at}",
@@ -301,7 +301,7 @@ def configuration_content() -> rx.Component:
                 ),
                 rx.el.h1(
                     "WORKSPACE CONFIGURATION",
-                    class_name="font-['Barlow_Condensed'] text-4xl font-semibold tracking-wide text-zinc-100 sm:text-5xl",
+                    class_name="font-['Barlow_Condensed'] text-4xl font-semibold tracking-wide text-zinc-900 sm:text-5xl",
                 ),
                 rx.el.p(
                     "Set the boundaries. Keep the service in control.",
@@ -313,7 +313,7 @@ def configuration_content() -> rx.Component:
                 "Reload confirmed values",
                 on_click=ConfigState.page_load,
                 disabled=ConfigState.busy,
-                class_name="flex items-center gap-2 rounded-md border border-white/15 bg-[#202226] px-4 py-3 text-xs text-zinc-200 hover:text-amber-300 disabled:opacity-40",
+                class_name="flex items-center gap-2 rounded-md border border-black/10 bg-zinc-100 px-4 py-3 text-xs text-zinc-800 hover:text-amber-300 disabled:opacity-40",
             ),
             class_name="flex flex-wrap items-center justify-between gap-5 py-8",
         ),
@@ -349,10 +349,10 @@ def configuration_content() -> rx.Component:
                 ),
                 rx.el.p(
                     "Loading authorized configuration…",
-                    class_name="text-xs text-zinc-400",
+                    class_name="text-xs text-zinc-600",
                 ),
                 rx.el.div(
-                    class_name="h-64 w-full animate-pulse rounded-md bg-zinc-800/60"
+                    class_name="h-64 w-full animate-pulse rounded-md bg-zinc-200/60"
                 ),
                 role="status",
                 class_name="flex flex-col items-center gap-5",
@@ -362,13 +362,13 @@ def configuration_content() -> rx.Component:
         rx.el.section(
             rx.el.h2(
                 "Platform configuration",
-                class_name="text-sm font-semibold text-zinc-200",
+                class_name="text-sm font-semibold text-zinc-800",
             ),
             rx.cond(
                 ConfigState.loading,
                 rx.el.p(
                     "Loading platform context…",
-                    class_name="mt-3 text-xs text-zinc-400",
+                    class_name="mt-3 text-xs text-zinc-600",
                 ),
                 rx.cond(
                     ConfigState.platform_error != "",
@@ -384,7 +384,7 @@ def configuration_content() -> rx.Component:
                             lambda config: rx.el.div(
                                 rx.el.p(
                                     config.summary,
-                                    class_name="mt-3 text-xs text-zinc-300",
+                                    class_name="mt-3 text-xs text-zinc-700",
                                 ),
                                 rx.foreach(
                                     ConfigState.platform_entries,
@@ -395,7 +395,7 @@ def configuration_content() -> rx.Component:
                                         ),
                                         rx.el.pre(
                                             entry.value,
-                                            class_name="mt-1 whitespace-pre-wrap break-words text-xs text-zinc-300",
+                                            class_name="mt-1 whitespace-pre-wrap break-words text-xs text-zinc-700",
                                         ),
                                         class_name="mt-3",
                                     ),
@@ -409,11 +409,11 @@ def configuration_content() -> rx.Component:
                     ),
                 ),
             ),
-            class_name="mt-6 rounded-md border border-white/10 bg-[#191b1e] p-5",
+            class_name="mt-6 rounded-md border border-black/10 bg-white p-5",
         ),
         rx.el.footer(
             "Scoped by tenant. Governed and confirmed by service.",
-            class_name="py-6 text-[9px] text-zinc-600",
+            class_name="py-6 text-[9px] text-zinc-400",
         ),
         class_name="w-full",
     )

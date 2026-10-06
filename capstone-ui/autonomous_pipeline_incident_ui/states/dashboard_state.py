@@ -175,12 +175,16 @@ class DashboardState(rx.State):
                     self.demo = result.demo
                     self.loaded = True
                     pipeline_state = await self.get_state(PipelineRunState)
+                    # Already inside this state tree's one shared mutable context
+                    # (Reflex disallows nesting `async with` on a sibling state).
                     pipeline_state.sync_scope(
                         result.tenant_id,
                         result.platform_id,
                         [row.name for row in result.pipelines],
                     )
-                    await pipeline_state._reload_history(result.tenant_id)
+                    history = await pipeline_state._reload_history(result.tenant_id)
+                    if history is not None:
+                        pipeline_state.history = history
         except Exception as error:
             kind = error.kind if isinstance(error, ServiceError) else "api"
             try:

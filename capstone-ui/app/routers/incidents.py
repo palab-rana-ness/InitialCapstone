@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
-from app.database import incident_repository
+from app.agents import pipeline_agent
+from app.database import incident_repository, workflow_repository
 from app.database.connection import get_db
 from app.incident_workflow import (
     get_incident_row,
@@ -18,6 +19,8 @@ from app.workflow_schemas import (
     DiagnosisResultRequest,
     FailureIngestRequest,
     PipelineRunIngestRequest,
+    PipelineRunStartRequest,
+    RemediationDecisionRequest,
     StandardApiResponse,
     response_ok,
 )
@@ -125,6 +128,66 @@ def get_dashboard_incidents(
     )
 
 
+@router.post("/pipeline-run/start", response_model=StandardApiResponse, status_code=202)
+async def start_pipeline_run(
+    body: PipelineRunStartRequest,
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+):
+    """Agent 1 (Pipeline Agent): starts the DataPipeline run and returns immediately.
+
+    The Reflex UI calls this instead of DataPipeline directly - all orchestration
+    (polling, failure handoff to Agent 2/3) happens server-side in this backend.
+
+    Must run on the event loop thread (not FastAPI's worker threadpool) because it
+    schedules the background poller via asyncio.create_task.
+    """
+    row, created = pipeline_agent.start_workflow(
+        tenant_id=body.tenant_id,
+        platform_id=body.platform_id,
+        pipeline=body.pipeline,
+        idempotency_key=idempotency_key,
+    )
+    return response_ok(
+        "Pipeline run accepted; polling continues in the background."
+        if created
+        else "Duplicate request - returning the existing in-flight workflow run.",
+        {
+            "workflow_run_id": row.workflow_run_id,
+            "status": row.state,
+            "created": created,
+        },
+    )
+
+
+@router.get("/pipeline-run/{workflow_run_id}/status", response_model=StandardApiResponse)
+def get_pipeline_run_status(
+    workflow_run_id: str,
+    db: Session = Depends(get_db),
+):
+    """Fast local-DB-only read the Reflex UI polls; never calls DataPipeline/AiDiagnosis directly."""
+    row = workflow_repository.get_workflow_run(db, workflow_run_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Workflow run not found")
+    return response_ok(
+        "Workflow run status fetched.",
+        {
+            "workflow_run_id": row.workflow_run_id,
+            "tenant_id": row.tenant_id,
+            "platform_id": row.platform_id,
+            "pipeline": row.pipeline,
+            "run_id": row.run_id,
+            "incident_id": row.incident_id,
+            "state": row.state,
+            "current_agent": row.current_agent,
+            "attempt_count": row.attempt_count,
+            "started_at": row.started_at.isoformat(),
+            "updated_at": row.updated_at.isoformat(),
+            "completed_at": row.completed_at.isoformat() if row.completed_at else None,
+            "error_detail": row.error_detail,
+        },
+    )
+
+
 @router.get("/{incident_id}", response_model=StandardApiResponse)
 def get_incident_detail(
     incident_id: str,
@@ -168,6 +231,15 @@ def get_incident_timeline(
             "timestamp": row.updated_at.isoformat(),
         },
     ]
+    agent_events = workflow_repository.list_events_for_incident(db, incident_id)
+    events.extend(
+        {
+            "label": f"{event.agent}: {event.event_type}",
+            "message": "",
+            "timestamp": event.created_at.isoformat(),
+        }
+        for event in agent_events
+    )
     return response_ok("Incident timeline fetched.", {"timeline": events})
 
 
@@ -226,6 +298,22 @@ def get_incident_diagnosis(
         "REJECTED",
         "ESCALATED",
     }
+    diagnosis = workflow_repository.get_latest_diagnosis(db, incident_id)
+    if diagnosis is not None:
+        return response_ok(
+            "Incident diagnosis fetched.",
+            {
+                "diagnosis": {
+                    "available": True,
+                    "summary": diagnosis.root_cause,
+                    "failure_location": diagnosis.failure_location,
+                    "confidence": diagnosis.confidence,
+                    "evidence": diagnosis.evidence,
+                    "similar_incidents": diagnosis.similar_incidents,
+                    "status": row.status,
+                }
+            },
+        )
     return response_ok(
         "Incident diagnosis fetched.",
         {
@@ -275,6 +363,21 @@ def get_incident_remediation(
     db: Session = Depends(get_db),
 ):
     row = _require_incident(db, incident_id, tenant_id, platform_id)
+    plan = workflow_repository.get_latest_remediation_plan(db, incident_id)
+    if plan is not None:
+        return response_ok(
+            "Incident remediation fetched.",
+            {
+                "remediation": {
+                    "actions": plan.actions,
+                    "approval_status": plan.approval_status,
+                    "approved_by": plan.approved_by,
+                    "executed": plan.executed,
+                    "approval_required": plan.approval_status == "PENDING",
+                    "status": row.status,
+                }
+            },
+        )
     return response_ok(
         "Incident remediation fetched.",
         {
@@ -286,6 +389,63 @@ def get_incident_remediation(
                 "status": row.status,
             }
         },
+    )
+
+
+@router.post("/{incident_id}/remediation/approve", response_model=StandardApiResponse)
+def approve_remediation(
+    incident_id: str,
+    body: RemediationDecisionRequest,
+    db: Session = Depends(get_db),
+):
+    """The single human approval gate: marks the fix plan ready for a future execution
+    agent. Nothing is executed by this call or anywhere else in this system today."""
+    _require_incident(db, incident_id)
+    plan = workflow_repository.set_remediation_decision(
+        db, incident_id=incident_id, approved=True, decided_by=body.decided_by
+    )
+    if plan is None:
+        raise HTTPException(status_code=404, detail="No remediation plan found for this incident")
+    workflow_repository.record_event(
+        db,
+        workflow_run_id=plan.workflow_run_id,
+        tenant_id=plan.tenant_id,
+        agent="Human",
+        event_type="APPROVAL_GRANTED",
+        payload={"decided_by": body.decided_by, "comment": body.comment},
+        incident_id=incident_id,
+    )
+    return response_ok(
+        "Remediation plan approved.",
+        {"incident_id": incident_id, "approval_status": plan.approval_status},
+    )
+
+
+@router.post("/{incident_id}/remediation/reject", response_model=StandardApiResponse)
+def reject_remediation(
+    incident_id: str,
+    body: RemediationDecisionRequest,
+    db: Session = Depends(get_db),
+):
+    _require_incident(db, incident_id)
+    plan = workflow_repository.set_remediation_decision(
+        db, incident_id=incident_id, approved=False, decided_by=body.decided_by
+    )
+    if plan is None:
+        raise HTTPException(status_code=404, detail="No remediation plan found for this incident")
+    incident_repository.mark_incident_rejected(db, incident_id)
+    workflow_repository.record_event(
+        db,
+        workflow_run_id=plan.workflow_run_id,
+        tenant_id=plan.tenant_id,
+        agent="Human",
+        event_type="APPROVAL_REJECTED",
+        payload={"decided_by": body.decided_by, "comment": body.comment},
+        incident_id=incident_id,
+    )
+    return response_ok(
+        "Remediation plan rejected.",
+        {"incident_id": incident_id, "approval_status": plan.approval_status},
     )
 
 

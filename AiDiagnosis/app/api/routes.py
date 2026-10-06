@@ -28,8 +28,21 @@ async def ai_diagnosis(trigger: IncidentTrigger) -> DiagnosisResponse:
     """
     graph = get_incident_diagnosis_graph()
 
+    # Tags/metadata let a single incident's full LangSmith trace (every node +
+    # every LLM call) be filtered as one unit, correlated across services.
+    run_config = {
+        "run_name": f"ai-diagnosis:{trigger.incident_id}",
+        "tags": [f"tenant:{trigger.tenant_id}", f"adapter:{trigger.adapter}"],
+        "metadata": {
+            "tenant_id": trigger.tenant_id,
+            "incident_id": trigger.incident_id,
+            "pipeline": trigger.pipeline,
+            "adapter": trigger.adapter,
+        },
+    }
+
     try:
-        result = graph.invoke({"trigger": trigger})
+        result = graph.invoke({"trigger": trigger}, config=run_config)
     except UnknownAdapterError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except ValueError as exc:
